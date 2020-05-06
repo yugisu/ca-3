@@ -4,6 +4,7 @@ LD = $(SDK_PREFIX)ld
 SIZE = $(SDK_PREFIX)size
 OBJCOPY = $(SDK_PREFIX)objcopy
 QEMU = qemu-system-gnuarmeclipse
+GDB = gdb-multiarch
 BOARD ?= STM32F4-Discovery
 MCU=STM32F407VG
 TARGET=firmware
@@ -30,4 +31,4 @@ clean:
 	-rm *.bin
 
 gdb:
-	gdb-multiarch $(TARGET).elf
+	$(GDB) $(TARGET).elf
