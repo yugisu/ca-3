@@ -21,10 +21,10 @@ LDFLAGS = -Wall --specs=nosys.specs -nostdlib -lgcc
 APP_PATH=$(abspath ./)
 ##################
 # add here GNU ASSEMBLY SOURCES .S
+GASSRC += compute.S
 GASSRC += start.S
 GASSRC += print.S
 GASSRC += bootloader.S
-GASSRC += compute.S
 ##################
 SOBJS = $(GASSRC:.S=.o)
 COBJS = $(patsubst .c,%.o,$(APP_SRC))
