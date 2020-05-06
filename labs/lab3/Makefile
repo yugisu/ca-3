@@ -14,7 +14,7 @@ TCP_ADDR=1234
 CFLAGS = -O0 -g3 -Wall
 ##################
 # LDFLAGS
-LDFLAGS = -Wall --specs=nosys.specs -nostdlib -lgcc  
+LDFLAGS = -Wall --specs=nosys.specs -nostdlib -lgcc
 ##################
 # PATH
 APP_PATH=$(abspath ./)
@@ -23,30 +23,31 @@ APP_PATH=$(abspath ./)
 GASSRC += start.S
 GASSRC += print.S
 GASSRC += bootloader.S
+GASSRC += compute.S
 ##################
 SOBJS = $(GASSRC:.S=.o)
 COBJS = $(patsubst .c,%.o,$(APP_SRC))
 .PHONY: all clean
-# Path to directories containing application source 
+# Path to directories containing application source
 vpath % $(APP_PATH)
 all: $(TARGET).bin $(COBJS) $(SOBJS) $(TARGET).elf kernel.bin
-%.o: %.S 
+%.o: %.S
 	$(CC) -x assembler-with-cpp  $(CFLAGS) -mcpu=$(CPU_CC) -c -o $@  $^
 
 bootloader.S: kernel.bin
-$(TARGET).elf: $(COBJS) $(SOBJS) 
-	$(CC) -mcpu=$(CPU_CC) $(LDFLAGS) -T./lscript.ld -o $@ $^ $(INCFLAGS) 
+$(TARGET).elf: $(COBJS) $(SOBJS)
+	$(CC) -mcpu=$(CPU_CC) $(LDFLAGS) -T./lscript.ld -o $@ $^ $(INCFLAGS)
 $(TARGET).bin: $(TARGET).elf $(COBJS) $(SOBJS)
 	$(OBJCOPY) -O binary   $(TARGET).elf  $(TARGET).bin
 kernel.bin:
 	$(CC) -x assembler-with-cpp  $(CFLAGS) -mcpu=$(CPU_CC) -c  kernel.S -o kernel.o
 	$(CC) -x assembler-with-cpp  $(CFLAGS) -mcpu=$(CPU_CC) -c  print.S -o print.o
-	$(CC) -mcpu=$(CPU_CC) $(LDFLAGS) -T./lscript_kernel.ld -o kernel.elf kernel.o print.o $(INCFLAGS)
+	$(CC) -mcpu=$(CPU_CC) $(LDFLAGS) -T./lscript_kernel.ld -o kernel.elf kernel.o print.o compute.o $(INCFLAGS)
 	$(OBJCOPY) -O binary  kernel.elf  kernel.bin
 qemu:
 	$(QEMU)  --verbose --verbose --board $(BOARD) --mcu $(MCU) -d unimp,guest_errors --image $(TARGET).elf --semihosting-config enable=on,target=native -gdb tcp::$(TCP_ADDR)  -S
 qemu_run:
-	$(QEMU)  --verbose --verbose --board $(BOARD) --mcu $(MCU) -d unimp,guest_errors --image $(TARGET).elf --semihosting-config enable=on,target=native 
+	$(QEMU)  --verbose --verbose --board $(BOARD) --mcu $(MCU) -d unimp,guest_errors --image $(TARGET).elf --semihosting-config enable=on,target=native
 
 clean:
 	-rm *.o
